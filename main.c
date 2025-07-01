@@ -15,126 +15,137 @@ int main() {
     // Tenta abrir o arquivo para leitura 
     FILE *arquivo = fopen(nomeArquivo, "r");
     if (!arquivo) {
-        perror("Nao foi possivel abrir o arquivo");
+        perror("Não foi possível abrir o arquivo");
         return 1;
     }
 
-    // Cria e inicializa a raiz da árvore 2-3-4
-    No234 *raiz = NULL;
-    int valor;
+    // Cria árvore 2-3-4 (inicialmente vazia)
+    arvore234* arv = (arvore234*)malloc(sizeof(arvore234));
+    if (!arv) { perror("malloc"); exit(1); }
+    arv->raiz = NULL;
+    arv->qtdSplit = 0;
+    arv->altura = 0;
+
+    // Cria árvore rubro-negra nula
+    rb *arvRN = NULL;
 
     // Leitura de todos os inteiros do arquivo, inserindo na B-Tree
+    int valor;
     while (fscanf(arquivo, "%d", &valor) == 1) {
-        inserir234(&raiz, valor);
+        insereChaveArvore(arv, valor);
     }
     fclose(arquivo);
 
     // Exibe a árvore 2-3-4 após a leitura inicial 
-    printf("\nArvore 2-3-4 gerada! \n");
-    printf("\n-- Arvore 2-3-4 (por nivel) --\n");
-    imprimirPorNivel(raiz, 0);
-    printf("\n-- Arvore 2-3-4 (visual) --\n");
-    imprimirVisual(raiz, 0);
+    printf("\nÁrvore 2-3-4 gerada! \n");
+    printf("\n-- Árvore 2-3-4 (por nível) --\n\n");
+    imprimirPorNivel(arv->raiz, 0);
+    printf("\n-- Árvore 2-3-4 (visual) --\n");
+    imprimirVisual(arv->raiz, 0);
 
     int opcao;
     // Loop principal do menu de operações 
     do {
         printf("\nMenu:\n");
-        printf("1. Inserir novo elemento na arvore 2-3-4\n");
-        printf("2. Remover elemento da arvore 2-3-4\n");
-        printf("3. Imprimir arvore 2-3-4\n");
-        printf("4. Converter em uma arvore rubro-negra\n");
+        printf("1. Inserir novo elemento na árvore 2-3-4\n");
+        printf("2. Remover elemento da árvore 2-3-4\n");
+        printf("3. Imprimir árvore 2-3-4\n");
+        printf("4. Converter em uma árvore rubro-negra\n");
         printf("5. Sair\n");
-        printf("Escolha uma opcao: ");
+        printf("Escolha uma opção: ");
         if (scanf("%d", &opcao) != 1) {
-            // Limpa o buffer de entrada em caso de erro
-            while(getchar() != '\n');
-            opcao = 0; // Reseta para opção inválida
+            fprintf(stderr, "Entrada inválida. Encerrando.\n");
+            return 1;
         }
 
         switch (opcao) {
             case 1:
+                // Inserção de novo elemento na árvore 2-3-4
                 printf("Digite o valor a inserir: ");
                 if (scanf("%d", &valor) == 1) {
-                    inserir234(&raiz, valor);
+                    insereChaveArvore(arv, valor);
                     printf("Valor %d inserido com sucesso.\n", valor);
-                } else {
-                     while(getchar() != '\n');
-                     printf("Entrada invalida.\n");
                 }
                 break;
 
             case 2:
+                // Remoção de elemento na árvore 2-3-4
                 printf("Digite o valor a remover: ");
                 if (scanf("%d", &valor) == 1) {
-                    if (remover234(&raiz, valor))
-                        printf("Valor %d removido (ou processo de remocao concluido).\n", valor);
+                    int ok = removerChave(arv, valor);
+                    if (ok)
+                        printf("Valor %d removido da árvore 2-3-4.\n", valor);
                     else
-                        printf("Valor %d nao encontrado na arvore 2-3-4.\n", valor);
-                } else {
-                     while(getchar() != '\n');
-                     printf("Entrada invalida.\n");
+                        printf("Valor %d não encontrado na árvore 2-3-4.\n", valor);
                 }
                 break;
 
             case 3:
-                printf("\n-- Arvore 2-3-4 (por nivel) --\n");
-                imprimirPorNivel(raiz, 0);
-                printf("\n-- Arvore 2-3-4 (visual) --\n");
-                imprimirVisual(raiz, 0);
+                // Impressão da árvore 2-3-4
+                printf("\n-- Árvore 2-3-4 (por nível) --\n\n");
+                imprimirPorNivel(arv->raiz, 0);
+                printf("\n-- Árvore 2-3-4 (visual) --\n");
+                imprimirVisual(arv->raiz, 0);
                 break;
 
             case 4: {
-                rb *arvRN = converterParaRN(raiz);
+                // Converter para Rubro-Negra a partir da 2-3-4
+                arvRN = converterParaRN(arv->raiz);
             
-                printf("\nArvore Rubro-Negra gerada! \n");
-                printf("\n-- Arvore Rubro-Negra (por nivel) --\n");
+                // Exibe a RB convertida 
+                printf("\nÁrvore Rubro-Negra gerada! \n");
+                printf("\n-- Árvore Rubro-Negra (por nível) --\n");
                 imprimirPorNivelRN(retornaRaiz(arvRN), 0);
-                printf("\n-- Arvore Rubro-Negra (visual) --\n");
+                printf("\n-- Árvore Rubro-Negra (visual) --\n");
                 imprimirVisualRN(retornaRaiz(arvRN), 0);
                 
                 int opcRN;
+                // Menu interno para a RB 
                 do {
-                    printf("\nMenu Rubro-Negra:\n");
-                    printf("1. Inserir novo elemento\n");
-                    printf("2. Remover elemento\n");
-                    printf("3. Imprimir arvore\n");
-                    printf("4. Voltar ao menu principal\n");
-                    printf("Escolha uma opcao: ");
-                    if (scanf("%d", &opcRN) != 1) {
-                         while(getchar() != '\n');
-                         opcRN = 0;
-                    }
+                    printf("\nMenu:\n");
+                    printf("1. Inserir novo elemento na árvore rubro-negra\n");
+                    printf("2. Remover elemento da árvore rubro-negra\n");
+                    printf("3. Imprimir árvore rubro-negra\n");
+                    printf("4. Sair (voltar ao menu principal)\n");
+                    printf("Escolha uma opção: ");
+                    if (scanf("%d", &opcRN) != 1) break;
 
                     switch (opcRN) {
-                        case 1:
+                        case 1: {
+                            // Inserção de novo elemento na RB
                             printf("Digite o valor a inserir na RN: ");
                             if (scanf("%d", &valor) == 1) {
                                 noRB *novo = alocaNo(arvRN, valor);
                                 insereNo(arvRN, novo);
-                                printf("Valor %d inserido na Rubro-Negra.\n", valor);
+                                printf("Valor %d inserido em Rubro-Negra.\n", valor);
                             }
                             break;
-                        case 2:
+                        }
+                        case 2: {
+                            // Remoção de elemento na RB
                             printf("Digite o valor a remover da RN: ");
                             if (scanf("%d", &valor) == 1) {
-                                if (removeNo(arvRN, valor))
+                                int ok = removeNo(arvRN, valor);
+                                if (ok)
                                     printf("Valor %d removido da Rubro-Negra.\n", valor);
                                 else
-                                    printf("Valor %d nao encontrado na Rubro-Negra.\n", valor);
+                                    printf("Valor %d não encontrado na Rubro-Negra.\n", valor);
                             }
                             break;
+                        }
                         case 3:
-                            printf("\n-- Arvore Rubro-Negra (por nivel) --\n");
+                            // Impressão da RB
+                            printf("\n-- Árvore Rubro-Negra (por nível) --\n");
                             imprimirPorNivelRN(retornaRaiz(arvRN), 0);
-                            printf("\n-- Arvore Rubro-Negra (visual) --\n");
+                            printf("\n-- Árvore Rubro-Negra (visual) --\n");
                             imprimirVisualRN(retornaRaiz(arvRN), 0);
                             break;
                         case 4:
+                            // Sair do menu RB e retornar ao menu principal
                             printf("Retornando ao menu principal.\n");
                             break;
                         default:
-                            printf("Opcao invalida. Tente novamente.\n");
+                            printf("Opção inválida. Tente novamente.\n");
                             break;
                     }
                 } while (opcRN != 4);
@@ -142,14 +153,23 @@ int main() {
             }
 
             case 5:
+                // Sair do programa
                 printf("Programa encerrado.\n");
                 break;
 
             default:
-                printf("Opcao invalida. Tente novamente.\n");
+                printf("Opção inválida. Tente novamente.\n");
                 break;
         }
     } while (opcao != 5);
+    // Libera toda a 2-3-4
+    free234(arv->raiz);
+    free(arv);
+
+    if (arvRN) {
+        freeRB(arvRN);
+    }
 
     return 0;
 }
+
