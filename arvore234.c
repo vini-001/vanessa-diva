@@ -3,39 +3,24 @@
 /* =========================================================================
                   FUNÇÕES REFERENTES À ÁRVORE 2-3-4 (B-TREE ORDEM 4) ========================================================================= */
 
-<<<<<<< Updated upstream
-=======
-// Estrutura auxiliar para promoção de chaves durante inserção
->>>>>>> Stashed changes
 typedef struct {
     bool houvePromocao;
     int chavePromovida;
     No234 *direitoNovo;
 } Promocao;
 
-<<<<<<< Updated upstream
 static Promocao inserirRec(No234 *noAtual, int valor);
 
-=======
-// Cria um novo nó 2-3-4
->>>>>>> Stashed changes
 No234* criarNo(bool folha) {
     No234 *no = malloc(sizeof(No234));
     no->numChaves = 0;
     no->folha = folha;
-<<<<<<< Updated upstream
-=======
-    no->pai = NULL;
-    for (int i = 0; i < CHAVES_MAXIMAS; i++)
-        no->chaves[i] = -1;
->>>>>>> Stashed changes
     for (int i = 0; i < FILHOS_MAXIMOS; i++) {
         no->filhos[i] = NULL;
     }
     return no;
 }
 
-<<<<<<< Updated upstream
 static Promocao dividirNo(No234 *noCheio) {
     int meio = CHAVES_MAXIMAS / 2;
     Promocao promo;
@@ -53,110 +38,12 @@ static Promocao dividirNo(No234 *noCheio) {
     if (!noCheio->folha) {
         for (int i = meio + 1, j = 0; i <= FILHOS_MAXIMOS - 1; i++, j++) {
             promo.direitoNovo->filhos[j] = noCheio->filhos[i];
-=======
-void insereChaveNoFolha(No234* noAlvo, int chave){
-    int i = noAlvo->numChaves - 1;
-
-    for(; i >= 0; i--){
-        if(noAlvo->chaves[i] > chave)
-            noAlvo->chaves[i + 1] = noAlvo->chaves[i];
-
-        else if(noAlvo->chaves[i] < chave)
-            break;
-    }
-
-    noAlvo->chaves[i + 1] = chave;
-
-    noAlvo->numChaves++;
-}
-
-void insereChaveNoInterno(No234* noAlvo, int chave, No234* filhoEsquerdo, No234* filhoDireito){
-    int i = noAlvo->numChaves - 1;
-
-    for(; i >= 0; i--){
-        if(noAlvo->chaves[i] > chave){
-            noAlvo->chaves[i + 1] = noAlvo->chaves[i];
-            noAlvo->filhos[i + 2] = noAlvo->filhos[i + 1];
-        }
-
-        else if(noAlvo->chaves[i] < chave)
-            break;
-    }
-
-    noAlvo->chaves[i + 1] = chave;
-
-    noAlvo->filhos[i + 1] = filhoEsquerdo;
-    noAlvo->filhos[i + 2] = filhoDireito;
-    filhoEsquerdo->pai = noAlvo;
-    filhoDireito ->pai = noAlvo;
-
-
-    noAlvo->numChaves++;
-}
-
-
-No234* divideNo(arvore234* arv, No234* pai, No234* noCheio, int chave){
-    arv->qtdSplit++;
-
-    int oldNumChaves = noCheio->numChaves;
-
-    if(!pai){
-        pai = criarNo(0); 
-        arv->raiz = pai;   
-        for (int i = 0; i < FILHOS_MAXIMOS; i++)
-            pai->filhos[i] = NULL;
-        noCheio->pai = pai;
-        arv->altura++;
-    }
-
-    int meio = CHAVES_MAXIMAS / 2;
-    int intermediario = noCheio->chaves[meio];
-
-    No234* noMaior = criarNo(noCheio->folha); 
-    noMaior->pai = pai; 
-
-    int j = 0;
-    for(int i = meio + 1; i < CHAVES_MAXIMAS; i++, j++){
-        noMaior->chaves[j] = noCheio->chaves[i];
-        noMaior->numChaves++;
-
-        noCheio->chaves[i] = -1;
-        noCheio->numChaves--;
-    }
-
-    if(noCheio->folha == 0){
-        int totalFilhos = oldNumChaves + 1;
-        for (int i = meio + 1, k = 0; i < totalFilhos; i++, k++){
-            noMaior->filhos[k] = noCheio->filhos[i];
-            if (noMaior->filhos[k])
-                noMaior->filhos[k]->pai = noMaior;
->>>>>>> Stashed changes
             noCheio->filhos[i] = NULL;
         }
         
     }
-<<<<<<< Updated upstream
     noCheio->numChaves = meio;
     return promo;
-=======
-
-    if(pai->numChaves == CHAVES_MAXIMAS){
-        pai = divideNo(arv, pai->pai, pai, chave);
-
-        noCheio->pai = pai;
-        noMaior->pai = pai;
-    }
-
-    insereChaveNoInterno(pai, intermediario, noCheio, noMaior);
-
-    noCheio->chaves[meio] = -1;
-    noCheio->numChaves--;
-
-    if(chave < intermediario)
-        return noCheio;
-    else
-        return noMaior;
->>>>>>> Stashed changes
 }
 
 
@@ -209,67 +96,31 @@ void insereChaveArvore(arvore234* arv, int chave){
 static void mesclarFilhos(No234 *noPai, int indice) {
     No234 *esq = noPai->filhos[indice];
     No234 *dir = noPai->filhos[indice + 1];
-<<<<<<< Updated upstream
     esq->chaves[esq->numChaves++] = noPai->chaves[indice];
     for (int i = 0; i < dir->numChaves; i++) {
         esq->chaves[esq->numChaves++] = dir->chaves[i];
     }
-=======
-
-    // Mover chave do pai para o filho esquerdo
-    esq->chaves[esq->numChaves++] = noPai->chaves[indice];
-
-    // Copiar chaves do filho direito para o esquerdo
-    for (int i = 0; i < dir->numChaves; i++) {
-        esq->chaves[esq->numChaves++] = dir->chaves[i];
-    }
-
-    // Se não for folha, mover filhos também e atualizar pai
->>>>>>> Stashed changes
     if (!esq->folha) {
         // calcula onde começa a inserção dos filhos de dir
         int start = esq->numChaves - dir->numChaves;
         for (int i = 0; i <= dir->numChaves; i++) {
-<<<<<<< Updated upstream
             esq->filhos[esq->numChaves + i - 1] = dir->filhos[i];
         }
     }
-=======
-            esq->filhos[start + i] = dir->filhos[i];
-            if (esq->filhos[start + i])
-                esq->filhos[start + i]->pai = esq;
-        }
-    }
-
-    // Ajustar nó pai: remover chave e ponteiro direito
->>>>>>> Stashed changes
     for (int i = indice; i < noPai->numChaves - 1; i++) {
         noPai->chaves[i]     = noPai->chaves[i + 1];
         noPai->filhos[i + 1] = noPai->filhos[i + 2];
     }
     noPai->numChaves--;
-<<<<<<< Updated upstream
     noPai->filhos[noPai->numChaves + 1] = NULL;
-=======
-
-    // Zera a referência ao nó que foi mesclado e libera memória
-    noPai->filhos[indice + 1] = NULL;
->>>>>>> Stashed changes
     free(dir);
 }
 
 
 static bool emprestarDaEsquerda(No234 *noPai, int indice) {
     No234 *noAtual = noPai->filhos[indice];
-<<<<<<< Updated upstream
     No234 *irmaoEsq = noPai->filhos[indice - 1];
     if (irmaoEsq->numChaves > CHAVES_MINIMAS) {
-=======
-    No234 *irmao = noPai->filhos[indice - 1];
-
-    if (irmao->numChaves > CHAVES_MINIMAS) {
-        // Deslocar tudo em noAtual para a direita
->>>>>>> Stashed changes
         for (int i = noAtual->numChaves - 1; i >= 0; i--) {
             noAtual->chaves[i + 1] = noAtual->chaves[i];
         }
@@ -296,15 +147,8 @@ static bool emprestarDaEsquerda(No234 *noPai, int indice) {
 
 static bool emprestarDaDireita(No234 *noPai, int indice) {
     No234 *noAtual = noPai->filhos[indice];
-<<<<<<< Updated upstream
     No234 *irmaoDir = noPai->filhos[indice + 1];
     if (irmaoDir->numChaves > CHAVES_MINIMAS) {
-=======
-    No234 *irmao = noPai->filhos[indice + 1];
-
-    if (irmao->numChaves > CHAVES_MINIMAS) {
-        // Mover chave do pai para noAtual
->>>>>>> Stashed changes
         noAtual->chaves[noAtual->numChaves++] = noPai->chaves[indice];
 
         // Ajustar filhos
