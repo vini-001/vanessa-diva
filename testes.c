@@ -3,6 +3,7 @@
 #include <time.h>
 #include "arvore234.h"
 
+// Função para embaralhar um array (algoritmo de Fisher-Yates)
 void embaralhar(int *array, size_t n) {
     if (n > 1) {
         for (size_t i = 0; i < n - 1; i++) {
@@ -24,20 +25,21 @@ void teste_insercao() {
 
     for (int i = 0; i < num_tamanhos; i++) {
         int tamanho = tamanhos[i];
-        No234* raiz = NULL;
-        zerar_contadores();
+        arvore234* arv = criarArvore234();
 
+        // Insere 'tamanho' elementos com valores aleatórios
         for (int j = 0; j < tamanho; j++) {
-            inserir234(&raiz, rand());
+            insereChaveArvore(arv, rand());
         }
 
-        printf("| %-20d | %-20llu | %-15d | %-20llu |\n",
+        printf("| %-20d | %-20d | %-15d | %-20d |\n",
                tamanho,
-               obter_contador_split(),
-               calcular_altura(raiz),
-               obter_contador_nos());
+               arv->qtdSplit,
+               arv->altura,
+               contarNos(arv->raiz));
 
-        destruir_arvore(&raiz);
+        free234(arv->raiz);
+        free(arv);
     }
     printf("\n");
 }
@@ -51,6 +53,8 @@ void teste_remocao() {
     float percentuais[] = {0.10, 0.20, 0.35, 0.50};
     int num_percentuais = sizeof(percentuais) / sizeof(float);
 
+    // Gera um conjunto fixo de números para garantir que cada teste de remoção
+    // parta da mesma árvore inicial.
     int* numeros_base = malloc(tamanho_base * sizeof(int));
     for(int i = 0; i < tamanho_base; i++) {
         numeros_base[i] = i;
@@ -58,35 +62,37 @@ void teste_remocao() {
 
     for (int i = 0; i < num_percentuais; i++) {
         float p = percentuais[i];
-        No234* raiz = NULL;
-        zerar_contadores();
+        arvore234* arv = criarArvore234();
 
-        // 1. Monta a árvore base
+        // 1. Monta a árvore base com 10.000 nós.
         for (int j = 0; j < tamanho_base; j++) {
-            inserir234(&raiz, numeros_base[j]);
+            insereChaveArvore(arv, numeros_base[j]);
         }
         
-        // Zera apenas os contadores de OPERAÇÃO, preservando o de nós.
-        zerar_contadores_operacao();
+        // Zera contadores de operação para medir apenas a remoção.
+        arv->qtdMerge = 0;
+        arv->qtdRotacao = 0;
         
+        // Cria uma cópia da lista de números e a embaralha para remover aleatoriamente.
         int a_remover = (int)(tamanho_base * p);
         int* numeros_para_remover = malloc(tamanho_base * sizeof(int));
         for(int j=0; j<tamanho_base; j++) numeros_para_remover[j] = numeros_base[j];
         embaralhar(numeros_para_remover, tamanho_base);
 
-        // 2. Executa a remoção
+        // 2. Executa a remoção.
         for (int j = 0; j < a_remover; j++) {
-            remover234(&raiz, numeros_para_remover[j]);
+            removerChave(arv, numeros_para_remover[j]);
         }
 
-        printf("| %-20.0f%% | %-20llu | %-20llu | %-15d | %-20llu |\n",
+        printf("| %-20.0f%% | %-20d | %-20d | %-15d | %-20d |\n",
                p * 100,
-               obter_contador_rotacao(),
-               obter_contador_merge(),
-               calcular_altura(raiz),
-               obter_contador_nos());
+               arv->qtdRotacao,
+               arv->qtdMerge,
+               arv->altura,
+               contarNos(arv->raiz));
 
-        destruir_arvore(&raiz);
+        free234(arv->raiz);
+        free(arv);
         free(numeros_para_remover);
     }
     free(numeros_base);
@@ -96,7 +102,7 @@ void teste_remocao() {
 int main() {
     // Usando uma semente fixa para garantir que os resultados sejam os mesmos a cada execução.
     // Para resultados diferentes, use srand(time(NULL));
-    srand(time(NULL));
+    srand(42);
 
     printf("Executando plano de testes para a Arvore 2-3-4...\n\n");
 

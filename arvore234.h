@@ -9,36 +9,73 @@
 #define FILHOS_MAXIMOS       (CHAVES_MAXIMAS + 1)
 #define CHAVES_MINIMAS       (CHAVES_MAXIMAS / 2)
 
+// Estrutura de nó da árvore 2-3-4
 typedef struct No234 {
     int numChaves;
-    int chaves[CHAVES_MAXIMAS + 1];
-    struct No234 *filhos[FILHOS_MAXIMOS + 1];
+    int chaves[CHAVES_MAXIMAS];
+    struct No234 *filhos[FILHOS_MAXIMOS];
     bool folha;
+    struct No234 *pai;
 } No234;
+
+// Estrutura de Árvore 2-3-4
+typedef struct {
+    No234 *raiz;
+    int qtdSplit;
+    int altura;
+    // ADIÇÕES PARA TESTES:
+    int qtdMerge;
+    int qtdRotacao;
+} arvore234;
+
+// Estrutura de nó da árvore rubro-negra
+typedef struct NO {
+    int chave;
+    struct NO *fesq;
+    struct NO *fdir;
+    struct NO *pai;
+    char cor;
+} noRB;
+
+// Estrutura da árvore RB com sentinelas
+struct RB {
+    noRB *sentinelaRaiz;
+    noRB *sentinelaFolha;
+};
+typedef struct RB rb;
 
 // -------------------- ÁRVORE 2-3-4 ---------------------------------------
 
-void inserir234(No234 **raizRef, int valor);
-int remover234(No234 **raizRef, int valor);
+void insereChaveArvore(arvore234* arv, int chave);
+int removerChave(arvore234 *arv, int valor);
+void imprimirPorNivel(No234 *no, int nivel);
+void imprimirVisual(No234 *no, int indent);
+void free234(No234 *no);
 
-// -------------------- FUNÇÕES DE TESTE E ANÁLISE -------------------------
+// ----------------- FUNÇÕES ADICIONAIS PARA TESTE -------------------------
 
-// Zera todos os contadores (operações e nós).
-void zerar_contadores();
+// Inicializa uma nova estrutura de árvore 2-3-4 para testes.
+arvore234* criarArvore234();
+// Conta o número total de nós na árvore.
+int contarNos(No234 *no);
 
-// Zera apenas os contadores de operação (split, merge, rotação).
-void zerar_contadores_operacao();
+// ----------------- CONVERSÃO 2-3-4 → RUBRO-NEGRA -------------------------
+// (As funções de Rubro-Negra não são usadas nos testes, mas são mantidas para integridade)
 
-// Retorna os valores dos contadores.
-unsigned long long int obter_contador_split();
-unsigned long long int obter_contador_merge();
-unsigned long long int obter_contador_rotacao();
-unsigned long long int obter_contador_nos();
-
-// Calcula a altura da árvore (raiz no nível 0).
-int calcular_altura(No234* no);
-
-// Libera toda a memória usada pela árvore.
-void destruir_arvore(No234** raizRef);
+rb* converterParaRN(No234 *raiz234);
+void atualiza_Sentinela_Folha(rb *T1,rb *T2,rb *novaRB,noRB *aux);
+rb* alocaArvore();
+noRB* alocaNo(rb *arv,int chave);
+void rotacaoEsquerda(rb *arv,noRB *x);
+void rotacaoDireita(rb *arv,noRB *y);
+void insereNo(rb *arv,noRB *z);
+void balanceamentoInsercao(rb *arv,noRB *z);
+int removeNo(rb *arv, int valor);
+void balanceamentoRemocao(rb *arv, noRB *x, noRB *pai);
+noRB* retornaRaiz(rb *arv);
+void imprimirPorNivelRN(noRB *no, int nivel);
+void imprimirVisualRN(noRB *no, int indent);
+void freeRBNodes(rb *tree, noRB *node);
+void freeRB(rb *tree);
 
 #endif // ARVORE234_H
