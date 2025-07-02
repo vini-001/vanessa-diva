@@ -1,7 +1,8 @@
-#include "arvore234.h"
+#include "conversao.h"
 
 /* =========================================================================
-                  FUNÇÕES REFERENTES À ÁRVORE 2-3-4 (B-TREE ORDEM 4) ========================================================================= */
+                  FUNÇÕES REFERENTES À ÁRVORE 2-3-4 (B-TREE ORDEM 4) 
+========================================================================= */
 
 // Estrutura auxiliar para promoção de chaves durante inserção
 typedef struct {
@@ -11,6 +12,7 @@ typedef struct {
 } Promocao;
 
 // Cria um novo nó 2-3-4
+// Retorna ponteiro para nó criado
 No234* criarNo(bool folha) {
     No234 *no = malloc(sizeof(No234));
     no->numChaves = 0;
@@ -24,6 +26,7 @@ No234* criarNo(bool folha) {
     return no;
 }
 
+// Insere chave em nó folha
 void insereChaveNoFolha(No234* noAlvo, int chave){
     int i = noAlvo->numChaves - 1;
 
@@ -40,6 +43,7 @@ void insereChaveNoFolha(No234* noAlvo, int chave){
     noAlvo->numChaves++;
 }
 
+// Insere chave em nó interno
 void insereChaveNoInterno(No234* noAlvo, int chave, No234* filhoEsquerdo, No234* filhoDireito){
     int i = noAlvo->numChaves - 1;
 
@@ -60,11 +64,12 @@ void insereChaveNoInterno(No234* noAlvo, int chave, No234* filhoEsquerdo, No234*
     filhoEsquerdo->pai = noAlvo;
     filhoDireito ->pai = noAlvo;
 
-
     noAlvo->numChaves++;
 }
 
 
+// Divide nó cheio em dois nós e sobe a chave intermediária
+// Retorna ponteiro para o nó que contém a chave inserida
 No234* divideNo(arvore234* arv, No234* pai, No234* noCheio, int chave){
     arv->qtdSplit++;
 
@@ -123,12 +128,7 @@ No234* divideNo(arvore234* arv, No234* pai, No234* noCheio, int chave){
         return noMaior;
 }
 
-
-
-
-
-
-//MATHEUS FEZ
+// Interface pública de inserção
 void insereChaveArvore(arvore234* arv, int chave){
     if (arv->raiz == NULL) {
         arv->raiz   = criarNo(true);
@@ -163,13 +163,8 @@ void insereChaveArvore(arvore234* arv, int chave){
     }
 }
 
-
-
-
-//--------------------------------------
 // Funções auxiliares para remoção 
 // (mesclarFilhos, emprestarDaEsquerda, emprestarDaDireita)
-
 static void mesclarFilhos(No234 *noPai, int indice) {
     No234 *esq = noPai->filhos[indice];
     No234 *dir = noPai->filhos[indice + 1];
@@ -206,6 +201,7 @@ static void mesclarFilhos(No234 *noPai, int indice) {
 }
 
 
+// Retorna true se conseguiu emprestar, false caso contrário
 static bool emprestarDaEsquerda(No234 *noPai, int indice) {
     No234 *noAtual = noPai->filhos[indice];
     No234 *irmao = noPai->filhos[indice - 1];
@@ -236,6 +232,7 @@ static bool emprestarDaEsquerda(No234 *noPai, int indice) {
     return false;
 }
 
+// Retorna true se conseguiu emprestar, false caso contrário
 static bool emprestarDaDireita(No234 *noPai, int indice) {
     No234 *noAtual = noPai->filhos[indice];
     No234 *irmao = noPai->filhos[indice + 1];
@@ -267,6 +264,8 @@ static bool emprestarDaDireita(No234 *noPai, int indice) {
     return false;
 }
 
+// Função recursiva de remoção
+// Retorna 1 se removeu, 0 caso contrário
 static int removerRec(No234 *noAtual, int valor) {
     int pos = 0;
     // Encontrar posição do valor
@@ -321,8 +320,8 @@ static int removerRec(No234 *noAtual, int valor) {
     return removido;
 }
 
-
 // Interface pública de remoção
+// Retorna 1 se removeu, 0 caso contrário
 static int remover234(No234 **raizRef, int valor) {
     if (*raizRef == NULL) {
         return 0;
@@ -334,9 +333,7 @@ static int remover234(No234 **raizRef, int valor) {
     if (ok && (*raizRef)->numChaves == 0 && !(*raizRef)->folha) {
         No234 *antigaRaiz = *raizRef;
         No234 *novaRaiz   = antigaRaiz->filhos[0];
-        // --- ajustes cruciais ---
         novaRaiz->pai    = NULL;
-        // ------------------------
         *raizRef = novaRaiz;
         free(antigaRaiz);
     }
@@ -344,7 +341,8 @@ static int remover234(No234 **raizRef, int valor) {
     return ok;
 }
 
-
+// Calcula altura de subárvore
+// Retorna altura da subárvore
 static int calculaAlturaNo(No234 *no) {
     if (!no) return 0;
     int maior = 0;
@@ -356,6 +354,8 @@ static int calculaAlturaNo(No234 *no) {
     return maior + 1;
 }
 
+// Interface pública de remoção
+// Retorna 1 se removeu, 0 caso contrário
 int removerChave(arvore234 *arv, int valor) {
     int ok = remover234(&arv->raiz, valor);
     if (ok) {
@@ -393,6 +393,7 @@ void imprimirVisual(No234 *no, int indent) {
     }
 }
 
+// Liberação de memória de árvore 2-3-4
 void free234(No234 *no) {
   if (!no) return;
   for (int i = 0; i <= no->numChaves; i++)
@@ -405,6 +406,7 @@ void free234(No234 *no) {
 =========================================================================*/
 
 // Inicializa árvore RB com sentinelas.
+// Retorna ponteiro para árvore criada.
 rb* alocaArvore(){
     rb *nova=(rb*)malloc(sizeof(rb));
     nova->sentinelaFolha=(noRB*)malloc(sizeof(noRB));
@@ -419,6 +421,7 @@ rb* alocaArvore(){
 }
 
 // Cria nó RB com chave e filhos na sentinela de folha.
+// Retorna ponteiro para nó criado.
 noRB* alocaNo(rb *arv,int chave){
     noRB *novoNo=(noRB*)malloc(sizeof(noRB));
     if(!novoNo) return NULL;
@@ -443,9 +446,13 @@ void atualiza_Sentinela_Folha(rb *T1,rb *T2,rb *novaRB,noRB *aux){
 }
 
 // Função recursiva que converte nó 2-3-4 em subárvore RB
+// Retorna ponteiro para nó RB criado.
 static noRB* converterNo234(No234 *n234, rb *arvRN) {
+    // Caso base: nó 2-3-4 é nulo, retorna sentinela de folha da RB
     if (!n234) return arvRN->sentinelaFolha;
 
+    // Converter subárvores 2-3-4 em subárvores RB
+    // Armazenar em array para facilitar a construção da RB
     noRB *sub[5];
     for (int i = 0; i <= n234->numChaves; i++) {
         sub[i] = converterNo234(n234->filhos[i], arvRN);
@@ -456,27 +463,37 @@ static noRB* converterNo234(No234 *n234, rb *arvRN) {
     noRB *vermelhoDir = NULL;
 
     if (n234->numChaves == 1) {
+        // Se só tem uma chave, a raiz local é preta
         raizLocal = alocaNo(arvRN, n234->chaves[0]); raizLocal->cor = 'P';
     } else if (n234->numChaves == 2) {
+        // Se 2 chaves → raiz com a chave maior (preta) + um filho vermelho à esquerda
         raizLocal = alocaNo(arvRN, n234->chaves[1]); raizLocal->cor = 'P';
         vermelhoEsq = alocaNo(arvRN, n234->chaves[0]); vermelhoEsq->cor = 'V';
     } else {
+        // Se 3 chaves → raiz com chave do meio (preta) + dois filhos vermelhos
         raizLocal = alocaNo(arvRN, n234->chaves[1]); raizLocal->cor = 'P';
         vermelhoEsq = alocaNo(arvRN, n234->chaves[0]); vermelhoEsq->cor = 'V';
         vermelhoDir = alocaNo(arvRN, n234->chaves[2]); vermelhoDir->cor = 'V';
     }
 
+    // Liga os nós vermelhos criados (se existirem) às subárvores apropriadas
     if (vermelhoEsq) {
+        // Conecta subárvores 0 e 1 ao nó vermelho esquerdo
         vermelhoEsq->fesq = sub[0]; vermelhoEsq->fdir = sub[1];
         sub[0]->pai = vermelhoEsq; sub[1]->pai = vermelhoEsq;
         vermelhoEsq->pai = raizLocal;
     }
     if (vermelhoDir) {
+        // Conecta subárvores 2 e 3 ao nó vermelho direito
         vermelhoDir->fesq = sub[2]; vermelhoDir->fdir = sub[3];
         sub[2]->pai = vermelhoDir; sub[3]->pai = vermelhoDir;
         vermelhoDir->pai = raizLocal;
     }
 
+    //    Conecta raizLocal às suas duas “filhas”:
+    //    - Se houver dois nós vermelhos: eles viram filhos direto e esquerdo.
+    //    - Se houver só um nó vermelho (caso de 2 chaves): o outro ponteiro
+    //      aponta para a subárvore remanescente.
     if (vermelhoEsq && vermelhoDir) {
         raizLocal->fesq = vermelhoEsq; raizLocal->fdir = vermelhoDir;
     } else if (vermelhoEsq) {
@@ -486,10 +503,12 @@ static noRB* converterNo234(No234 *n234, rb *arvRN) {
         sub[0]->pai = raizLocal; sub[1]->pai = raizLocal;
     }
 
+    // Devolve a raiz da subárvore RB correspondente a n234
     return raizLocal;
 }
 
 // Interface pública para converter 2-3-4 em RB
+// Retorna ponteiro para árvore RB criada.
 rb* converterParaRN(No234 *raiz234) {
     if (!raiz234) return NULL;
     rb *novaRN = alocaArvore();
@@ -651,6 +670,7 @@ void balanceamentoRemocao(rb *arv,noRB *x,noRB *pai){
 }
 
 // Função para remover um nó da árvore rubro-negra
+// Retorna 1 se removeu, 0 caso contrário
 int removeNo(rb *arv, int valor) {
     noRB *z = arv->sentinelaRaiz->fdir;
     noRB *x, *y;
@@ -687,7 +707,7 @@ int removeNo(rb *arv, int valor) {
         x->pai = z->pai;
 
     } else {
-        // caso com dois filhos: usar predecessor ao invés de sucessor
+        // caso com dois filhos: usar predecessor 
         y = z->fesq;
         // desce até o mais à direita na subárvore esquerda
         while (y->fdir != arv->sentinelaFolha)
@@ -755,6 +775,7 @@ void imprimirVisualRN(noRB *no, int indent) {
     imprimirVisualRN(no->fesq, indent + 4);
 }
 
+// Liberação de memória de nós de árvore rubro-negra
 void freeRBNodes(rb *tree, noRB *node) {
     if (!node || node == tree->sentinelaFolha) return;
     freeRBNodes(tree, node->fesq);
@@ -762,6 +783,7 @@ void freeRBNodes(rb *tree, noRB *node) {
     free(node);
 }
 
+// Liberação de memória de árvore rubro-negra
 void freeRB(rb *tree) {
     if (!tree) return;
     // libera todos os nós de verdade

@@ -1,5 +1,5 @@
-#ifndef ARVORE234_H
-#define ARVORE234_H
+#ifndef CONVERSAO_H
+#define CONVERSAO_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -18,7 +18,7 @@ typedef struct No234 {
     struct No234 *pai;
 } No234;
 
-// Estrutura de Árvore 2-3-4 
+// Estrutura de árvore 2-3-4 
 typedef struct {
     No234 *raiz;
     int qtdSplit;
@@ -56,6 +56,7 @@ int removerChave(arvore234 *arv, int valor);
 void imprimirPorNivel(No234 *no, int nivel);
 void imprimirVisual(No234 *no, int indent);
 
+// Liberação de memória
 void free234(No234 *no);
 
 // ----------------- CONVERSÃO 2-3-4 → RUBRO-NEGRA -------------------------
@@ -91,9 +92,8 @@ noRB* retornaRaiz(rb *arv);
 void imprimirPorNivelRN(noRB *no, int nivel);
 void imprimirVisualRN(noRB *no, int indent);
 
+// Liberação de memória
 void freeRBNodes(rb *tree, noRB *node);
 void freeRB(rb *tree);
 
-#endif // ARVORE234_H
-
-
+#endif // CONVERSAO_H
