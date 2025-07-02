@@ -387,10 +387,10 @@ void imprimirVisual(No234 *no, int indent) {
 
 // Liberação de memória de árvore 2-3-4
 void free234(No234 *no) {
-  if (!no) return;
-  for (int i = 0; i <= no->numChaves; i++)
+    if (!no) return;
+    for (int i = 0; i <= no->numChaves; i++)
     free234(no->filhos[i]);
-  free(no);
+    free(no);
 }
 
 /* =========================================================================
@@ -514,7 +514,7 @@ rb* converterParaRN(No234 *raiz234) {
 
 
 /* =========================================================================
-                  FUNÇÕES REFERENTES À ÁRVORE RUBRO-NEGRA  
+FUNÇÕES REFERENTES À ÁRVORE RUBRO-NEGRA  
 =========================================================================*/
 
 // Rotação simples a esquerda

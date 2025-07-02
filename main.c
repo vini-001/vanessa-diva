@@ -1,4 +1,4 @@
-#include "conversao.c"
+#include "conversao.h"
 #include <stdio.h>
 #include <stdlib.h>
 
