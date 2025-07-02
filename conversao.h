@@ -1,5 +1,6 @@
-#ifndef ARVORE234_H
-#define ARVORE234_H
+// adaptado pra testes  
+#ifndef CONVERSAO_H
+#define CONVERSAO_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -18,12 +19,12 @@ typedef struct No234 {
     struct No234 *pai;
 } No234;
 
-// Estrutura de Árvore 2-3-4
+// Estrutura de árvore 2-3-4
 typedef struct {
     No234 *raiz;
     int qtdSplit;
     int altura;
-    // ADIÇÕES PARA TESTES:
+    // ADIÇÕES PARA TESTES
     int qtdMerge;
     int qtdRotacao;
 } arvore234;
@@ -53,15 +54,10 @@ void imprimirVisual(No234 *no, int indent);
 void free234(No234 *no);
 
 // ----------------- FUNÇÕES ADICIONAIS PARA TESTE -------------------------
-
-// Inicializa uma nova estrutura de árvore 2-3-4 para testes.
 arvore234* criarArvore234();
-// Conta o número total de nós na árvore.
 int contarNos(No234 *no);
 
 // ----------------- CONVERSÃO 2-3-4 → RUBRO-NEGRA -------------------------
-// (As funções de Rubro-Negra não são usadas nos testes, mas são mantidas para integridade)
-
 rb* converterParaRN(No234 *raiz234);
 void atualiza_Sentinela_Folha(rb *T1,rb *T2,rb *novaRB,noRB *aux);
 rb* alocaArvore();
@@ -78,4 +74,4 @@ void imprimirVisualRN(noRB *no, int indent);
 void freeRBNodes(rb *tree, noRB *node);
 void freeRB(rb *tree);
 
-#endif // ARVORE234_H
+#endif // CONVERSAO_H
