@@ -320,27 +320,6 @@ static int removerRec(No234 *noAtual, int valor) {
     return removido;
 }
 
-// Interface pública de remoção
-// Retorna 1 se removeu, 0 caso contrário
-static int remover234(No234 **raizRef, int valor) {
-    if (*raizRef == NULL) {
-        return 0;
-    }
-
-    int ok = removerRec(*raizRef, valor);
-
-    // Se raiz ficou vazia e não é folha, descer uma altura
-    if (ok && (*raizRef)->numChaves == 0 && !(*raizRef)->folha) {
-        No234 *antigaRaiz = *raizRef;
-        No234 *novaRaiz   = antigaRaiz->filhos[0];
-        novaRaiz->pai    = NULL;
-        *raizRef = novaRaiz;
-        free(antigaRaiz);
-    }
-
-    return ok;
-}
-
 // Calcula altura de subárvore
 // Retorna altura da subárvore
 static int calculaAlturaNo(No234 *no) {
@@ -357,7 +336,20 @@ static int calculaAlturaNo(No234 *no) {
 // Interface pública de remoção
 // Retorna 1 se removeu, 0 caso contrário
 int removerChave(arvore234 *arv, int valor) {
-    int ok = remover234(&arv->raiz, valor);
+    if (arv->raiz == NULL) {
+        return 0;
+    }
+
+    int ok = removerRec(arv->raiz, valor);
+
+    // Se raiz ficou vazia e não é folha, descer uma altura
+    if (ok && (arv->raiz)->numChaves == 0 && !(arv->raiz)->folha) {
+        No234 *antigaRaiz = arv->raiz;
+        No234 *novaRaiz   = antigaRaiz->filhos[0];
+        novaRaiz->pai    = NULL;
+        arv->raiz = novaRaiz;
+        free(antigaRaiz);
+    }
     if (ok) {
         arv->altura = calculaAlturaNo(arv->raiz);
     }
@@ -522,7 +514,8 @@ rb* converterParaRN(No234 *raiz234) {
 
 
 /* =========================================================================
-                  FUNÇÕES REFERENTES À ÁRVORE RUBRO-NEGRA  =========================================================================*/
+                  FUNÇÕES REFERENTES À ÁRVORE RUBRO-NEGRA  
+=========================================================================*/
 
 // Rotação simples a esquerda
 void rotacaoEsquerda(rb *arv,noRB *x){
@@ -795,8 +788,3 @@ void freeRB(rb *tree) {
     // libera a struct de controle
     free(tree);
 }
-
-
-
-
-
