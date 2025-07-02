@@ -1,4 +1,4 @@
-#include "arvore234.h"
+#include "conversao.h"
 
 /* =========================================================================
                   FUNÇÕES REFERENTES À ÁRVORE 2-3-4 (B-TREE ORDEM 4)
